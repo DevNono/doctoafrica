@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import React, { useState, useEffect } from 'react';
 import { useForm } from "@inertiajs/react";
+import axios from "axios";
 
 export default function Message(props) {
     const [connected, setConnected] = useState(false);
@@ -9,17 +10,22 @@ export default function Message(props) {
     const [message, setMessage] = useState(null);
     const [formError, setFormError] = useState(false);
 
-    const { data, setData, post, processing, errors } = useForm({
-        message: "",
-    });
-
     function handleConnection(isConnected) {
         setConnected((prev) => !prev);
     }
 
-    function submit(e) {
+    async function submit(e) {
         e.preventDefault();
-        post(route("messages.store"));
+
+        const formData = new FormData();
+        formData.append("message", message);
+        await axios.post("/messages", formData).then((response) => {
+            setMessageList((prev) => [...prev, {
+                message: response.data.message.message,
+                user_id: response.data.message.user_id,
+                created_at: response.data.message.created_at
+            }]);
+        });
     }
 
     useEffect(() => {
@@ -63,11 +69,9 @@ export default function Message(props) {
                         <input
                             className="w-full rounded-lg border-gray-200 p-3 text-sm"
                             type="text"
-                            value={data.message}
-                            onChange={(e) => setData("message", e.target.value)}
+                            onChange={(e) => setMessage(e.target.value)}
                         />
-                        {errors.message && <div>{errors.message}</div>}
-                        <button type="submit" className="inline-block w-full text-white rounded-lg bg-black px-5 py-3 font-medium  sm:w-auto" disabled={processing}>
+                        <button type="submit" className="inline-block w-full text-white rounded-lg bg-black px-5 py-3 font-medium  sm:w-auto">
                             Login
                         </button>
                     </form>

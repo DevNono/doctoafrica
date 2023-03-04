@@ -23,10 +23,8 @@ class MessageController extends Controller
             'message' => $request->message,
             'user_id' =>  auth()->user()->id,
         ]);
+        broadcast(new MessageSent($message))->toOthers();
 
-        // broadcast(new MessageSent($message->load('user')))->toOthers();
-        MessageSent::dispatch($message);
-
-        return to_route('messages.index');
+        return response()->json(['message' => $message]);
     }
 }
