@@ -38,4 +38,6 @@ Route::middleware('auth')->group(function () {
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
 
+Route::get('/users', [MessageController::class, 'users'])->name('index');
+
 require __DIR__.'/auth.php';
