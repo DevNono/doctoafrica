@@ -35,9 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
-
-Route::get('/users', [MessageController::class, 'users'])->name('index');
+Route::get('/conversations', [MessageController::class, 'conversation'])->name('conversations');
 
 require __DIR__.'/auth.php';

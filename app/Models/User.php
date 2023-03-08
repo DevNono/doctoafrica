@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Role;
 use App\Models\Message;
+use App\Models\Conversation;
 
 class User extends Authenticatable
 {
@@ -54,5 +55,10 @@ class User extends Authenticatable
     public function messages()
     {
         return $this->hasMany(Message::class);
+    }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class);
     }
 }
