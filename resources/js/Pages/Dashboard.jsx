@@ -1,7 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import React from 'react';
+import { router } from "@inertiajs/react";
 
 export default function Dashboard(props) {
+
     return (
         <AuthenticatedLayout
             auth={props.auth}
@@ -9,14 +12,10 @@ export default function Dashboard(props) {
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>}
         >
             <Head title="Dashboard" />
-
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">You're logged in!</div>
-                    </div>
-                </div>
-            </div>
+            <button className="py-1 px-3 rounded-lg text-white bg-[#ff4757] text-[1rem] duration-300 hover:-translate-y-0.5"
+                onClick={() => { router.get(route("conversations")); }}>
+                Conversations
+            </button>
         </AuthenticatedLayout>
     );
 }
