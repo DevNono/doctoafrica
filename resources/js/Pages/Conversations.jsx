@@ -56,21 +56,21 @@ export default function Conversations(props) {
         <AuthenticatedLayout
             auth={props.auth}
             errors={props.errors}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Conversations</h2>}
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Conversations</h2>}
         >
 
-            <div className='flex'>
-                <div>
+            <div className='flex w-full'>
+                <div className='flex flex-wrap items-center w-full gap-8 justify-evenly'>
                     {conversations.map((conv, index) => (
-                        <div key={index} className="flex flex-col md:flex-row items-center space-x-4 p-2 md:p-3 rounded-xl shadow-lg bg-white">
-                            <div className="relative w-fit hover:scale-105 duration-200 py-2 md:py-0">
+                        <div key={index} className="flex flex-col items-center p-2 space-x-4 bg-white shadow-lg md:flex-row md:p-3 rounded-xl">
+                            <div className="relative py-2 duration-200 w-fit hover:scale-105 md:py-0">
                                 {/* <img
-                            className="hidden dark:block w-20 h-20 rounded-3xl hover:scale-110 duration-300"
+                            className="hidden w-20 h-20 duration-300 dark:block rounded-3xl hover:scale-110"
                             src="your-img-path.png"
                             alt="avatar"
                         />
                         <img
-                            className="block dark:hidden w-20 h-20 rounded-3xl"
+                            className="block w-20 h-20 dark:hidden rounded-3xl"
                             src="your-img-path.png"
                             alt="avatar"
                         /> */}
@@ -79,11 +79,11 @@ export default function Conversations(props) {
                                     *
                                 </p>
                             </div>
-                            <div className="flex flex-col space-y-1 py-2 md:py-0">
-                                <h5 className="text-primary font-medium text-sm">
+                            <div className="flex flex-col py-2 space-y-1 md:py-0">
+                                <h5 className="text-sm font-medium text-primary">
                                     {conv.user.name}
                                 </h5>
-                                <small className="text-xs font-lighttext-primary  dark:text-gray-400">
+                                <small className="text-xs font-lighttext-primary dark:text-gray-400">
                                     {/* {conv.messages[0].message} */}
                                 </small>
                                 <span className="space-x-2">
@@ -102,15 +102,15 @@ export default function Conversations(props) {
                     <div className="h-14"></div>
 
                     {props.users.map((user, index) => (
-                        <div key={index} className="flex flex-col md:flex-row items-center space-x-4 p-2 md:p-3 rounded-xl shadow-lg bg-white">
-                            <div className="relative w-fit hover:scale-105 duration-200 py-2 md:py-0">
+                        <div key={index} className="flex flex-col items-center p-2 space-x-4 bg-white shadow-lg md:flex-row md:p-3 rounded-xl">
+                            <div className="relative py-2 duration-200 w-fit hover:scale-105 md:py-0">
                                 {/* <img
-                            className="hidden dark:block w-20 h-20 rounded-3xl hover:scale-110 duration-300"
+                            className="hidden w-20 h-20 duration-300 dark:block rounded-3xl hover:scale-110"
                             src="your-img-path.png"
                             alt="avatar"
                         />
                         <img
-                            className="block dark:hidden w-20 h-20 rounded-3xl"
+                            className="block w-20 h-20 dark:hidden rounded-3xl"
                             src="your-img-path.png"
                             alt="avatar"
                         /> */}
@@ -119,11 +119,11 @@ export default function Conversations(props) {
                                     *
                                 </p>
                             </div>
-                            <div className="flex flex-col space-y-1 py-2 md:py-0">
-                                <h5 className="text-primary font-medium text-sm">
+                            <div className="flex flex-col py-2 space-y-1 md:py-0">
+                                <h5 className="text-sm font-medium text-primary">
                                     {user.name}
                                 </h5>
-                                <small className="text-xs font-lighttext-primary  dark:text-gray-400">
+                                <small className="text-xs font-lighttext-primary dark:text-gray-400">
                                     {/* {conv.messages[0].message} */}
                                 </small>
                                 <span className="space-x-2">
@@ -140,7 +140,7 @@ export default function Conversations(props) {
                     ))}
                 </div>
 
-                {conversation && <div className="flex flex-col items-center justify-start gap-4 bg-indigo-200 px-4 py-3  ">
+                {conversation && <div className="flex flex-col items-center justify-start gap-4 px-4 py-3 bg-indigo-200 ">
                     <h2>{conversation.user.name}</h2>
                     {messageList.map((message, index) => (
                         <div key={index}>
@@ -151,13 +151,13 @@ export default function Conversations(props) {
                         <form onSubmit={submit}>
                             <label className="sr-only" >Message</label>
                             <input
-                                className="w-full rounded-lg border-gray-200 p-3 text-sm"
+                                className="w-full p-3 text-sm border-gray-200 rounded-lg"
                                 type="text"
                                 value={data.message}
                                 onChange={(e) => setData("message", e.target.value)}
                             />
                             {errors.message && <div>{errors.message}</div>}
-                            <button type="submit" className="inline-block w-full text-white rounded-lg bg-black px-5 py-3 font-medium  sm:w-auto" disabled={processing}>
+                            <button type="submit" className="inline-block w-full px-5 py-3 font-medium text-white bg-black rounded-lg sm:w-auto" disabled={processing}>
                                 Login
                             </button>
                         </form>
