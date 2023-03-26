@@ -76,7 +76,7 @@ export default function Conversations(props) {
                         /> */}
                                 <ApplicationLogo className="w-20 h-20 rounded-3xl" />
                                 <p className="absolute bottom-2 text-white -right-1 w-5 h-5 flex items-center justify-center p-2 text-xs rounded-2xl bg-[#ff4757]">
-                                    *
+                                    {conv.newMessageCount}
                                 </p>
                             </div>
                             <div className="flex flex-col space-y-1 py-2 md:py-0">
@@ -144,7 +144,7 @@ export default function Conversations(props) {
                     <h2>{conversation.user.name}</h2>
                     {messageList.map((message, index) => (
                         <div key={index}>
-                            <p> <i>{message.created_at}</i>    <b>{message.user_id} </b>  : {message.message}</p>
+                            <p> <i>{message.created_at}</i>    <b>{message.user_id} / {message.id} </b>  : {message.message}</p>
                         </div>
                     ))}
                     <div>
