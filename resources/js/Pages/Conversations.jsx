@@ -6,38 +6,59 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { router } from "@inertiajs/react";
 
 export default function Conversations(props) {
-    const [messageList, setMessageList] = useState([]);
-    const conversations = props.conversations;
+    const [conversations, setConversations] = useState(props.conversations);
     const conversation = props.conversation;
+    const [messageList, setMessageList] = useState(conversation ? conversation.messages : []);
 
-    const { data, setData, post, processing, errors, transform } = useForm({
+    const [values, setValues] = useState({
         message: "",
-    });
+        conversation: conversation ? conversation.id : null,
+        withUser_id: props.withUser_id
+    })
 
-    function submit(e) {
-        setMessageList((prev) => [...prev, {
-            message: "test",
-            user_id: 1,
-            created_at: "test"
-        }]);
-        e.preventDefault();
-        transform((data) => ({
-            ...data,
-            conversation: conversation.id,
-            withUser_id: props.withUser_id
+    function handleChange(e) {
+        const key = e.target.id;
+        const value = e.target.value
+        setValues(values => ({
+            ...values,
+            [key]: value,
         }))
-        post(route("messages.store"),
-            {
-                preserveScroll: true,
-                preserveState: true,
-            });
+    }
+
+    async function submit(e) {
+        e.preventDefault()
+        await axios.post("/messages", values).then((response) => {
+            setMessageList((prev) => [...prev, {
+                message: response.data.message.message,
+                user_id: response.data.message.user_id,
+                created_at: response.data.message.created_at
+            }]);
+            const index = conversations.findIndex(x => x.user.id == response.data.message.user_id);
+            if (index == -1) {
+                setConversations((prev) => [...prev, {
+                    id: response.data.message.conversation_id,
+                    lastRead: 0,
+                    user: {
+                        id: response.data.message.user_id,
+                        name: "Unknown",
+                        email: "Unknown",
+                    },
+                    messages: [{
+                        message: response.data.message.message,
+                        id: -1,
+                        user_id: response.data.message.user_id,
+                        receiver_id: response.data.message.receiver_id,
+                        created_at: response.data.message.created_at,
+                        updated_at: response.data.message.updated_at,
+                    }],
+                    newMessageCount: 0
+                }]);
+            }
+        });
     }
 
     useEffect(() => {
         console.log(props)
-        if (conversation) {
-            setMessageList(conversation.messages);
-        }
         const channel = Echo.channel(`App.Models.User.${props.auth.user.id}`);
         channel.listen('MessageSent', (e) => {
             if (e.message.user_id == props.withUser_id) {
@@ -46,6 +67,35 @@ export default function Conversations(props) {
                     user_id: e.message.user_id,
                     created_at: e.message.created_at
                 }]);
+                axios.post("/messageSeen", { conversation_id: e.message.conversation_id });
+            } else {
+                const index = conversations.findIndex(x => x.user.id == e.message.user_id);
+                if (index == -1) {
+                    setConversations((prev) => [...prev, {
+                        id: e.message.conversation_id,
+                        lastRead: 0,
+                        user: {
+                            id: e.message.user_id,
+                            name: "Unknown",
+                            email: "Unknown",
+                        },
+                        messages: [{
+                            message: e.message.message,
+                            id: -1,
+                            user_id: e.message.user_id,
+                            receiver_id: e.message.receiver_id,
+                            created_at: e.message.created_at,
+                            updated_at: e.message.updated_at,
+                        }],
+                        newMessageCount: 1
+                    }]);
+                } else {
+                    setConversations((prev) => {
+                        let newConversations = JSON.parse(JSON.stringify(prev))
+                        newConversations[index].newMessageCount = newConversations[index].newMessageCount + 1;
+                        return newConversations;
+                    });
+                }
             }
         });
 
@@ -141,10 +191,10 @@ export default function Conversations(props) {
                 </div>
 
                 {conversation && <div className="flex flex-col items-center justify-start gap-4 bg-indigo-200 px-4 py-3  ">
-                    <h2>{conversation.user.name}</h2>
+                    <h2>{conversation.user.name} / {conversation.id}</h2>
                     {messageList.map((message, index) => (
                         <div key={index}>
-                            <p> <i>{message.created_at}</i>    <b>{message.user_id} / {message.id} </b>  : {message.message}</p>
+                            <p> <i>{message.created_at}</i>    <b> {message.user_id} / {message.id} </b>  : {message.message}</p>
                         </div>
                     ))}
                     <div>
@@ -153,11 +203,10 @@ export default function Conversations(props) {
                             <input
                                 className="w-full rounded-lg border-gray-200 p-3 text-sm"
                                 type="text"
-                                value={data.message}
-                                onChange={(e) => setData("message", e.target.value)}
+                                id="message"
+                                onChange={(e) => handleChange(e)}
                             />
-                            {errors.message && <div>{errors.message}</div>}
-                            <button type="submit" className="inline-block w-full text-white rounded-lg bg-black px-5 py-3 font-medium  sm:w-auto" disabled={processing}>
+                            <button type="submit" className="inline-block w-full text-white rounded-lg bg-black px-5 py-3 font-medium  sm:w-auto">
                                 Login
                             </button>
                         </form>

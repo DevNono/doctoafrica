@@ -28,7 +28,15 @@ class MessageController extends Controller
 
         broadcast(new MessageSent($message))->toOthers();
 
-        return to_route('conversations', ['withUser_id' => $request->withUser_id]);
+        return response()->json(['message' => $message]);;
+    }
+
+    public function messageSeen(Request $request){
+        $conversation = Conversation::find($request->conversation_id);
+        $messageId = $conversation->messages()->latest()->first()->id ?? 0;
+        $conversation->users()->where('user_id', '=', auth()->user()->id)->first()->pivot->update([
+            'lastRead' => $messageId
+        ]);
     }
 
     public function conversation(Request $request)
@@ -50,10 +58,10 @@ class MessageController extends Controller
                 ]);
             }
             // Update lastRead au dernier message envoyé dans la conv
-            // $id= $conversation->messages()->latest()->first()->id ?? 0;
-            // $conversation->users()->where('user_id', '=', auth()->user()->id)->first()->pivot->update([
-            //     'lastRead' => $id
-            // ]);
+            $id= $conversation->messages()->latest()->first()->id ?? 0;
+            $conversation->users()->where('user_id', '=', auth()->user()->id)->first()->pivot->update([
+                'lastRead' => $id
+            ]);
         }
 
         return Inertia::render('Conversations', [
