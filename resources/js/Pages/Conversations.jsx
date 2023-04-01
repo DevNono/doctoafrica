@@ -29,7 +29,6 @@ export default function Conversations(props) {
     const conversation = props.conversation ? new Conversation(props.conversation.id, props.conversation.lastRead, props.conversation.user, props.conversation.messages, props.conversation.newMessageCount) : null;
     const [conversations, setConversations] = useState(props.conversations.map((conv) => { return new Conversation(conv.id, conv.lastRead, conv.user, conv.messages, conv.newMessageCount) }));
     const [messageList, setMessageList] = useState(props.conversation ? props.conversation.messages.map((message) => { return new Message(message.message, message.user_id, message.created_at, message.id) }) : []);
-
     const [values, setValues] = useState({
         message: "",
         conversation: conversation ? conversation.id : null,
@@ -52,36 +51,27 @@ export default function Conversations(props) {
 
     //TODO: updated_at utile ?
     function updateConversation(id, message, user_id, receiver_id, created_at, updated_at) {
-        const $id = props.auth.user.id == user_id ? receiver_id : user_id;
-        const index = conversations.findIndex(x => x.user.id == $id);
-        console.log(index)
-        console.log(conversations)
-        if (index == -1) {
-            console.log("new conversation")
-            setConversations((prev) => {
-                let newConversations = JSON.parse(JSON.stringify(prev))
+        const Userid = props.auth.user.id == user_id ? receiver_id : user_id;
+        setConversations((prev) => {
+            const index = prev.findIndex((conv) => conv.user.id == Userid);
+            let newConversations = JSON.parse(JSON.stringify(prev))
+            if (index == -1) {
                 newConversations.push(new Conversation(id, 0, {
                     //TODO: get user data
-                    id: user_id, name: "Unknown",
+                    id: Userid, name: "Unknown",
                     email: "Unknown",
                 }, new Message(message, user_id, created_at), props.auth.user.id == receiver_id ? 1 : 0))
-                return newConversations;
-            });
-        } else {
-            if (receiver_id == props.auth.user.id) {
-                console.log("update conversation")
-                // setConversations((prev) => {
-                //     let newConversations = JSON.parse(JSON.stringify(prev))
-                //     newConversations[index].newMessageCount = newConversations[index].newMessageCount + 1;
-                //     return newConversations;
-                // });
+            } else {
+                if(props.auth.user.id == receiver_id){
+                    newConversations[index].newMessageCount = newConversations[index].newMessageCount + 1;
+                }
             }
-        }
+            return newConversations;
+        });
     }
 
     async function submit(e) {
         e.preventDefault()
-        console.log("submit");
         await axios.post("/messages", values).then((response) => {
             updateMessageList(response.data.message.message, response.data.message.user_id, response.data.message.created_at);
             updateConversation(response.data.message.conversation_id, response.data.message.message, response.data.message.user_id, response.data.message.receiver_id, response.data.message.created_at, response.data.message.updated_at);
