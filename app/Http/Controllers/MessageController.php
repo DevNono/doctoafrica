@@ -28,14 +28,22 @@ class MessageController extends Controller
 
         broadcast(new MessageSent($message))->toOthers();
 
-        return to_route('conversations', ['withUser_id' => $request->withUser_id]);
+        return response()->json(['message' => $message]);;
+    }
+
+    public function messageSeen(Request $request){
+        $conversation = Conversation::find($request->conversation_id);
+        $messageId = $conversation->messages()->latest()->first()->id ?? 0;
+        $conversation->users()->where('user_id', '=', auth()->user()->id)->first()->pivot->update([
+            'lastRead' => $messageId
+        ]);
     }
 
     public function conversation(Request $request)
     {
         $conversations = new ConversationCollection(auth()->user()->conversations);
         $users = User::all();
-        if($request->withUser_id) {
+        if ($request->withUser_id) {
             $id = $request->withUser_id;
             $conversation = Conversation::whereHas('users', function ($query) use ($id) {
                 $query->where('user_id', $id);
@@ -49,12 +57,18 @@ class MessageController extends Controller
                     auth()->user()->id
                 ]);
             }
+            // Update lastRead au dernier message envoyé dans la conv
+            $id= $conversation->messages()->latest()->first()->id ?? 0;
+            $conversation->users()->where('user_id', '=', auth()->user()->id)->first()->pivot->update([
+                'lastRead' => $id
+            ]);
         }
+
         return Inertia::render('Conversations', [
             'conversation' => $request->withUser_id ? new ConversationResource($conversation) : null,
             'withUser_id' => $request->withUser_id ? $request->withUser_id : null,
             'conversations' => $conversations,
-            'users' => new UserCollection($users)
+            'users' => new UserCollection($users),
         ]);
     }
 }

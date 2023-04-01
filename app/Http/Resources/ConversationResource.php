@@ -14,10 +14,14 @@ class ConversationResource extends JsonResource
      */
     public function toArray($request)
     {
+        $lastRead = $this->users()->where('user_id', '=', auth()->user()->id)->first()->pivot->lastRead;
+        $newMessageCount = $this->messages()->where('id', '>', $lastRead)->where('user_id', '!=', auth()->user()->id)->count();
         return [
             'id' => $this->id,
             'user' => new UserResource($this->getWithUser()),
             'messages' => new MessageCollection($this->messages),
+            'newMessageCount' => $newMessageCount,
+            'lastRead' => $lastRead
         ];
     }
 }

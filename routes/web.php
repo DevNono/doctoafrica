@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::post('/messageSeen', [MessageController::class, 'messageSeen'])->name('messages.seen');
 Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
 Route::get('/conversations', [MessageController::class, 'conversation'])->name('conversations');
 
