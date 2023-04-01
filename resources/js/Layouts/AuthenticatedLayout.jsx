@@ -25,7 +25,7 @@ export default function Authenticated({ auth, header, children }) {
                     <div className="flex gap-2">
                         <Avatar src={"https://picsum.photos/200"} />
                         <div className="flex flex-col justify-around">
-                            <p className="-mb-2 font-bold">Dr. Robert Bruce</p>
+                            <p className="-mb-2 font-bold">{auth.user.name}</p>
                             <span className="text-xs text-gray-500">
                                 Médecin
                             </span>
