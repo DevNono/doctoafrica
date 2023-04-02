@@ -1,69 +1,116 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import React, { useState, useEffect } from 'react';
-import { useForm } from "@inertiajs/react";
-import ApplicationLogo from '@/Components/ApplicationLogo';
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import React, { useState, useEffect } from "react";
+import ApplicationLogo from "@/Components/ApplicationLogo";
 import { router } from "@inertiajs/react";
+import Avatar from "@/Components/Avatar";
+
+class Conversation {
+    constructor(id, lastRead, user, messages, newMessageCount) {
+        this.id = id;
+        this.lastRead = lastRead;
+        this.user = user;
+        this.messages = messages;
+        this.newMessageCount = newMessageCount;
+    }
+}
+
+class Message {
+    constructor(message, user_id, created_at, id) {
+        this.message = message;
+        this.user_id = user_id;
+        this.created_at = created_at;
+        this.id = id;
+    }
+}
 
 export default function Conversations(props) {
-
-    class Conversation {
-        constructor(id, lastRead, user, messages, newMessageCount) {
-            this.id = id;
-            this.lastRead = lastRead;
-            this.user = user;
-            this.messages = messages;
-            this.newMessageCount = newMessageCount;
-        }
-    }
-
-    class Message {
-        constructor(message, user_id, created_at, id) {
-            this.message = message;
-            this.user_id = user_id;
-            this.created_at = created_at;
-            this.id = id;
-        }
-    }
-
-    const conversation = props.conversation ? new Conversation(props.conversation.id, props.conversation.lastRead, props.conversation.user, props.conversation.messages, props.conversation.newMessageCount) : null;
-    const [conversations, setConversations] = useState(props.conversations.map((conv) => { return new Conversation(conv.id, conv.lastRead, conv.user, conv.messages, conv.newMessageCount) }));
-    const [messageList, setMessageList] = useState(props.conversation ? props.conversation.messages.map((message) => { return new Message(message.message, message.user_id, message.created_at, message.id) }) : []);
+    const conversation = props.conversation
+        ? new Conversation(
+              props.conversation.id,
+              props.conversation.lastRead,
+              props.conversation.user,
+              props.conversation.messages,
+              props.conversation.newMessageCount
+          )
+        : null;
+    const [conversations, setConversations] = useState(
+        props.conversations.map((conv) => {
+            return new Conversation(
+                conv.id,
+                conv.lastRead,
+                conv.user,
+                conv.messages,
+                conv.newMessageCount
+            );
+        })
+    );
+    const [messageList, setMessageList] = useState(
+        props.conversation
+            ? props.conversation.messages.map((message) => {
+                  return new Message(
+                      message.message,
+                      message.user_id,
+                      message.created_at,
+                      message.id
+                  );
+              })
+            : []
+    );
     const [values, setValues] = useState({
         message: "",
         conversation: conversation ? conversation.id : null,
-        withUser_id: props.withUser_id
-    })
+        withUser_id: props.withUser_id,
+    });
 
     function handleChange(e) {
         const key = e.target.id;
-        const value = e.target.value
-        setValues(values => ({
+        const value = e.target.value;
+        setValues((values) => ({
             ...values,
             [key]: value,
-        }))
+        }));
     }
 
     function updateMessageList(message, user_id, created_at) {
         //TODO: get message id
-        setMessageList((prev) => [...prev, new Message(message, user_id, created_at, -1)]);
+        setMessageList((prev) => [
+            ...prev,
+            new Message(message, user_id, created_at, -1),
+        ]);
     }
 
     //TODO: updated_at utile ?
-    function updateConversation(id, message, user_id, receiver_id, created_at, updated_at) {
+    function updateConversation(
+        id,
+        message,
+        user_id,
+        receiver_id,
+        created_at,
+        updated_at
+    ) {
         const Userid = props.auth.user.id == user_id ? receiver_id : user_id;
         setConversations((prev) => {
             const index = prev.findIndex((conv) => conv.user.id == Userid);
-            let newConversations = JSON.parse(JSON.stringify(prev))
+            let newConversations = JSON.parse(JSON.stringify(prev));
             if (index == -1) {
-                newConversations.push(new Conversation(id, 0, {
-                    //TODO: get user data
-                    id: Userid, name: "Unknown",
-                    email: "Unknown",
-                }, new Message(message, user_id, created_at), props.auth.user.id == receiver_id ? 1 : 0))
+                newConversations.push(
+                    new Conversation(
+                        id,
+                        0,
+                        {
+                            //TODO: get user data
+                            id: Userid,
+                            name: "Unknown",
+                            email: "Unknown",
+                        },
+                        new Message(message, user_id, created_at),
+                        props.auth.user.id == receiver_id ? 1 : 0
+                    )
+                );
             } else {
-                if(props.auth.user.id == receiver_id){
-                    newConversations[index].newMessageCount = newConversations[index].newMessageCount + 1;
+                if (props.auth.user.id == receiver_id) {
+                    newConversations[index].newMessageCount =
+                        newConversations[index].newMessageCount + 1;
                 }
             }
             return newConversations;
@@ -71,141 +118,269 @@ export default function Conversations(props) {
     }
 
     async function submit(e) {
-        e.preventDefault()
+        e.preventDefault();
         await axios.post("/messages", values).then((response) => {
-            updateMessageList(response.data.message.message, response.data.message.user_id, response.data.message.created_at);
-            updateConversation(response.data.message.conversation_id, response.data.message.message, response.data.message.user_id, response.data.message.receiver_id, response.data.message.created_at, response.data.message.updated_at);
+            updateMessageList(
+                response.data.message.message,
+                response.data.message.user_id,
+                response.data.message.created_at
+            );
+            updateConversation(
+                response.data.message.conversation_id,
+                response.data.message.message,
+                response.data.message.user_id,
+                response.data.message.receiver_id,
+                response.data.message.created_at,
+                response.data.message.updated_at
+            );
         });
     }
 
     useEffect(() => {
-        console.log(props)
         const channel = Echo.channel(`App.Models.User.${props.auth.user.id}`);
-        channel.listen('MessageSent', (e) => {
+        channel.listen("MessageSent", (e) => {
             if (e.message.receiver_id == props.auth.user.id) {
                 if (e.message.user_id == props.withUser_id) {
-                    updateMessageList(e.message.message, e.message.user_id, e.message.created_at);
-                    axios.post("/messageSeen", { conversation_id: e.message.conversation_id });
+                    updateMessageList(
+                        e.message.message,
+                        e.message.user_id,
+                        e.message.created_at
+                    );
+                    axios.post("/messageSeen", {
+                        conversation_id: e.message.conversation_id,
+                    });
                 } else {
-                    updateConversation(e.message.conversation_id, e.message.message, e.message.user_id, e.message.receiver_id, e.message.created_at, e.message.updated_at);
+                    updateConversation(
+                        e.message.conversation_id,
+                        e.message.message,
+                        e.message.user_id,
+                        e.message.receiver_id,
+                        e.message.created_at,
+                        e.message.updated_at
+                    );
                 }
             }
         });
-
     }, []);
-
 
     return (
         <AuthenticatedLayout
             auth={props.auth}
             errors={props.errors}
-            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Conversations</h2>}
+            header={
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Conversations
+                </h2>
+            }
         >
-
-            <div className='flex w-full'>
-                <div className='flex flex-wrap items-center w-full gap-8 justify-evenly'>
-                    {conversations.map((conv, index) => (
-                        <div key={index} className="flex flex-col items-center p-2 space-x-4 bg-white shadow-lg md:flex-row md:p-3 rounded-xl">
-                            <div className="relative py-2 duration-200 w-fit hover:scale-105 md:py-0">
-                                {/* <img
-                            className="hidden w-20 h-20 duration-300 dark:block rounded-3xl hover:scale-110"
-                            src="your-img-path.png"
-                            alt="avatar"
+            <div className="flex w-full h-[calc(100vh-70px)] px-8 py-10 gap-10">
+                <div className="flex flex-col items-center justify-center w-1/4 h-full gap-3">
+                    <div className="flex items-center justify-center flex-1 w-full drop-shadow-md">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="absolute w-6 h-6 left-3"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                            />
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Rechercher"
+                            className="w-full px-4 py-2 pl-10 text-gray-600 bg-white border-0 rounded-full outline-none focus:outline-none focus:shadow-outline"
                         />
-                        <img
-                            className="block w-20 h-20 dark:hidden rounded-3xl"
-                            src="your-img-path.png"
-                            alt="avatar"
-                        /> */}
-                                <ApplicationLogo className="w-20 h-20 rounded-3xl" />
-                                <p className="absolute bottom-2 text-white -right-1 w-5 h-5 flex items-center justify-center p-2 text-xs rounded-2xl bg-[#ff4757]">
-                                    {conv.newMessageCount}
-                                </p>
-                            </div>
-                            <div className="flex flex-col py-2 space-y-1 md:py-0">
-                                <h5 className="text-sm font-medium text-primary">
-                                    {conv.user.name}
-                                </h5>
-                                <small className="text-xs font-lighttext-primary dark:text-gray-400">
-                                    {/* {conv.messages[0].message} */}
-                                </small>
-                                <span className="space-x-2">
-                                    <button className="py-1 px-3 rounded-lg text-white bg-[#ff4757] text-[0.6rem] duration-300 hover:-translate-y-0.5"
-                                        onClick={() => { router.get(route("conversations"), { withUser_id: conv.user.id }); }}>
-                                        Open
-                                    </button>
-                                    <button className="py-1 px-3 rounded-lg bg-white shadow-xl dark:bg-primary text-[0.6rem] duration-300 hover:-translate-y-1">
-                                        Nothing
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-
-                    <div className="h-14"></div>
-
-                    {props.users.map((user, index) => (
-                        <div key={index} className="flex flex-col items-center p-2 space-x-4 bg-white shadow-lg md:flex-row md:p-3 rounded-xl">
-                            <div className="relative py-2 duration-200 w-fit hover:scale-105 md:py-0">
-                                {/* <img
-                            className="hidden w-20 h-20 duration-300 dark:block rounded-3xl hover:scale-110"
-                            src="your-img-path.png"
-                            alt="avatar"
-                        />
-                        <img
-                            className="block w-20 h-20 dark:hidden rounded-3xl"
-                            src="your-img-path.png"
-                            alt="avatar"
-                        /> */}
-                                <ApplicationLogo className="w-20 h-20 rounded-3xl" />
-                                <p className="absolute bottom-2 text-white -right-1 w-5 h-5 flex items-center justify-center p-2 text-xs rounded-2xl bg-[#ff4757]">
-                                    *
-                                </p>
-                            </div>
-                            <div className="flex flex-col py-2 space-y-1 md:py-0">
-                                <h5 className="text-sm font-medium text-primary">
-                                    {user.name}
-                                </h5>
-                                <small className="text-xs font-lighttext-primary dark:text-gray-400">
-                                    {/* {conv.messages[0].message} */}
-                                </small>
-                                <span className="space-x-2">
-                                    <button className="py-1 px-3 rounded-lg text-white bg-[#ff4757] text-[0.6rem] duration-300 hover:-translate-y-0.5"
-                                        onClick={() => { router.get(route("conversations"), { withUser_id: user.id }); }}>
-                                        Open
-                                    </button>
-                                    <button className="py-1 px-3 rounded-lg bg-white shadow-xl dark:bg-primary text-[0.6rem] duration-300 hover:-translate-y-1">
-                                        Nothing
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-                    ))}
+                    </div>
+                    <div className="flex flex-col w-full h-full gap-1 bg-white rounded-3xl drop-shadow-md">
+                        <h3 className="px-4 pt-4 font-bold">
+                            Liste des messages
+                        </h3>
+                        {conversations.map((conv) => {
+                            return (
+                                <div
+                                    key={conv.id}
+                                    className="flex items-center justify-between w-full px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-100"
+                                    onClick={() => {
+                                        router.get(route("conversations"), {
+                                            withUser_id: conv.user.id,
+                                        });
+                                    }}
+                                >
+                                    <div className="flex items-center justify-between w-full">
+                                        <div className="flex items-center">
+                                            <img
+                                                src="https://picsum.photos/200"
+                                                className="w-10 h-10 rounded-full"
+                                            />
+                                            <div className="flex flex-col ml-3">
+                                                <span className="text-sm font-semibold text-gray-800">
+                                                    {conv.user.name}
+                                                </span>
+                                                <span className="text-xs text-gray-600">
+                                                    {
+                                                        conv.messages[
+                                                            conv.messages.length - 1
+                                                        ].message
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col justify-end">
+                                            <span className="text-xs text-right text-gray-600">
+                                                2h
+                                            </span>
+                                            <span className="px-2 py-0.5 text-xs text-white bg-red-500 rounded-full">
+                                                {
+                                                    conv.newMessageCount
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-                {conversation && <div className="flex flex-col items-center justify-start gap-4 bg-indigo-200 px-4 py-3  ">
-                    <h2>{conversation.user.name} / {conversation.id}</h2>
-                    {messageList.map((message, index) => (
-                        <div key={index}>
-                            <p> <i>{message.created_at}</i>    <b> {message.user_id} / {message.id} </b>  : {message.message}</p>
+                <div className="flex flex-col w-3/4 h-full">
+                    <div className="flex flex-col w-full h-full gap-4 bg-white rounded-3xl drop-shadow-md">
+                        { conversation && (
+                            <>
+                        <div className="flex justify-between px-4 pt-4">
+                            <div className="flex items-center gap-2">
+                                <Avatar src={'https://picsum.photos/200'} />
+                                <p className="font-bold">
+                                    {conversation.user.name}
+                                </p>
+                            </div>
+                            <button className="">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"
+                                    />
+                                </svg>
+                            </button>
                         </div>
-                    ))}
-                    <div>
-                        <form onSubmit={submit}>
-                            <label className="sr-only" >Message</label>
-                            <input
-                                className="w-full p-3 text-sm border-gray-200 rounded-lg"
-                                type="text"
+                        <hr />
+                        <div className="flex flex-col flex-1 gap-4 px-4 py-4 overflow-y-auto">
+                            {messageList.map((message) => {
+                                    return (
+                                        <div
+                                            key={message.id}
+                                            className={`flex flex-col justify-center w-full ${
+                                                message.user_id ==
+                                                props.auth.user.id
+                                                    ? "items-end"
+                                                    : "items-start"
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <span className="">
+                                                    {message.user_id ==
+                                                    props.auth.user.id
+                                                        ? conversation.user.name
+                                                        : "You"}
+                                                </span>
+                                                <span className="text-xs ">
+                                                    {message.created_at}
+                                                </span>
+                                            </div>
+                                            <div
+                                                className={`flex items-center justify-center w-3/4 px-4 py-2 rounded-lg ${
+                                                    message.user_id ==
+                                                    props.auth.user.id
+                                                        ? "bg-blue-400 rounded-tr-none"
+                                                        : "bg-gray-200 rounded-tl-none"
+                                                }`}
+                                            >
+                                                <span className="text-sm text-white">
+                                                    {message.message}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                        <hr />
+                        <form
+                            onSubmit={submit}
+                            className="flex items-center justify-between w-full gap-3 px-4 pb-4"
+                        >
+                            <button className="">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"
+                                    />
+                                </svg>
+                            </button>
+                            <textarea
+                                className="w-full px-4 py-2 text-gray-600 bg-white border-0 rounded-lg outline-none focus:outline-none focus:shadow-outline"
+                                placeholder="Ecrivez votre message"
+                                style={{ resize: "none" }}
+                                rows={1}
                                 id="message"
                                 onChange={(e) => handleChange(e)}
-                            />
-                            <button type="submit" className="inline-block w-full text-white rounded-lg bg-black px-5 py-3 font-medium  sm:w-auto">
-                                Login
+                            ></textarea>
+
+                            <button className="">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z"
+                                    />
+                                </svg>
+                            </button>
+                            <button type="submit" className="">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                                    />
+                                </svg>
                             </button>
                         </form>
+                        </>
+                    )}
                     </div>
-                </div>}
+                </div>
             </div>
-
         </AuthenticatedLayout>
     );
 }

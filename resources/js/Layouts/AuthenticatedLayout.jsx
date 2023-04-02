@@ -1,17 +1,12 @@
-import { useState } from "react";
-import ApplicationLogo from "@/Components/ApplicationLogo";
-import MainSearchBar from "@/Components/NavBar/MainSearchBar";
-import NotificationBell from "@/Components/NavBar/NotificationBell";
-import LeftNavButton from "@/Components/NavBar/LeftNavButton";
-import Avatar from "@/Components/Avatar";
-import Dropdown from "@/Components/Dropdown";
-import NavLink from "@/Components/NavLink";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
-import { Link, usePage } from "@inertiajs/react";
+import React from 'react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
+import MainSearchBar from '@/Components/NavBar/MainSearchBar';
+import NotificationBell from '@/Components/NavBar/NotificationBell';
+import LeftNavButton from '@/Components/NavBar/LeftNavButton';
+import Avatar from '@/Components/Avatar';
+import { Link, usePage } from '@inertiajs/react';
 
-export default function Authenticated({ auth, header, children }) {
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+export default function Authenticated({ auth, children }) {
     const { url } = usePage();
 
     return (
@@ -24,7 +19,7 @@ export default function Authenticated({ auth, header, children }) {
                 <div className="flex items-center justify-end flex-1 gap-8 ml-auto">
                     <NotificationBell />
                     <div className="flex gap-2">
-                        <Avatar src={"https://picsum.photos/200"} />
+                        <Avatar src={'https://picsum.photos/200'} />
                         <div className="flex flex-col justify-around">
                             <p className="-mb-2 font-bold">{auth.user.name}</p>
                             <span className="text-xs text-gray-500">
@@ -32,7 +27,7 @@ export default function Authenticated({ auth, header, children }) {
                             </span>
                         </div>
                     </div>
-                    <Link href={route("logout")} method="post" as="button">
+                    <Link href={route('logout')} method="post" as="button">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -53,7 +48,7 @@ export default function Authenticated({ auth, header, children }) {
 
             <main className="flex">
                 <nav className="flex flex-col h-[calc(100vh-70px)] gap-12 pt-12 bg-white w-52">
-                    <LeftNavButton route={route("dashboard")} text={"Accueil"} active={url.startsWith('/dashboard') ? true : false}>
+                    <LeftNavButton route={route('dashboard')} text={'Accueil'} active={url.startsWith('/dashboard') ? true : false}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -69,7 +64,7 @@ export default function Authenticated({ auth, header, children }) {
                             />
                         </svg>
                     </LeftNavButton>
-                    <LeftNavButton route={route("conversations")} text={"Chat"} active={url.startsWith('/conversations') ? true : false}>
+                    <LeftNavButton route={route('conversations')} text={'Chat'} active={url.startsWith('/conversations') ? true : false}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -85,7 +80,7 @@ export default function Authenticated({ auth, header, children }) {
                             />
                         </svg>
                     </LeftNavButton>
-                    <LeftNavButton route={"agenda"} text={"Agenda"} active={url.startsWith('/agenda') ? true : false}>
+                    <LeftNavButton route={'agenda'} text={'Agenda'} active={url.startsWith('/agenda') ? true : false}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -101,7 +96,7 @@ export default function Authenticated({ auth, header, children }) {
                             />
                         </svg>
                     </LeftNavButton>
-                    <LeftNavButton route={/*route("tickets")*/ 0} text={"Mes tickets"} active={url.startsWith('/tickets') ? true : false}>
+                    <LeftNavButton route={route('visio')} text={'Mes tickets'} active={url.startsWith('/tickets') ? true : false}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"

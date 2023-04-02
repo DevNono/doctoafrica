@@ -1,4 +1,5 @@
 import { Link } from "@inertiajs/react";
+import React from "react";
 
 export default function LeftNavButton({ children, route, text, active }) {
     return <>
