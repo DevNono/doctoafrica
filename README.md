@@ -8,5 +8,6 @@
 - Run `php artisan migrate`
 - Run `php artisan db:seed`
 - Run `php artisan key:generate`
+- Run `npm i`
 - Run `php artisan serve` and `npm run dev`
 - Go to `http://localhost:8000`
