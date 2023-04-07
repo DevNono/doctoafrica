@@ -12,13 +12,18 @@ export default function Authenticated({ auth, children }) {
     return (
         <div className="w-full min-h-screen bg-gray-50">
             <div className="flex justify-between bg-white h-[70px] p-4 items-center">
-                <Link href="/" className="flex items-center flex-1 mr-auto">
+                <Link href="/" className="flex items-center lg:mr-auto lg:flex-1">
                     <ApplicationLogo className="block w-auto h-9" />
                 </Link>
                 <MainSearchBar />
-                <div className="flex items-center justify-end flex-1 gap-8 ml-auto">
-                    <NotificationBell />
-                    <div className="flex gap-2">
+                <div className="flex items-center gap-8 lg:ml-auto lg:justify-end lg:flex-1">
+                    <a className="flex items-center cursor-pointer lg:hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </a>
+                    <NotificationBell notification={true} />
+                    <div className="hidden gap-2 lg:flex">
                         <Avatar src={'https://picsum.photos/200'} />
                         <div className="flex flex-col justify-around">
                             <p className="-mb-2 font-bold">{auth.user.name}</p>
@@ -27,7 +32,7 @@ export default function Authenticated({ auth, children }) {
                             </span>
                         </div>
                     </div>
-                    <Link href={route('logout')} method="post" as="button">
+                    <Link className="hidden lg:block" href={route('logout')} method="post" as="button">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -43,11 +48,16 @@ export default function Authenticated({ auth, children }) {
                             />
                         </svg>
                     </Link>
+                    <div className="flex flex-col gap-1.5 lg:hidden">
+                        <span className="w-6 h-0.5 bg-gray-600 animate-pulse"></span>
+                        <span className="w-6 h-0.5 bg-gray-600 animate-pulse"></span>
+                        <span className="w-6 h-0.5 bg-gray-600 animate-pulse"></span>
+                    </div>
                 </div>
             </div>
 
             <main className="flex">
-                <nav className="flex flex-col h-[calc(100vh-70px)] gap-12 pt-12 bg-white w-52">
+                <nav className="hidden lg:flex flex-col h-[calc(100vh-70px)] gap-12 pt-12 bg-white w-52">
                     <LeftNavButton route={route('dashboard')} text={'Accueil'} active={url.startsWith('/dashboard') ? true : false}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

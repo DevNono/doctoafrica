@@ -56,6 +56,11 @@ export default function Conversations(props) {
               })
             : []
     );
+
+    const [conversationOpened, setConversationOpened] = useState(
+        true
+    );
+
     const [values, setValues] = useState({
         message: "",
         conversation: conversation ? conversation.id : null,
@@ -173,9 +178,9 @@ export default function Conversations(props) {
                 </h2>
             }
         >
-            <div className="flex w-full h-[calc(100vh-70px)] px-8 py-10 gap-10">
-                <div className="flex flex-col items-center justify-center w-1/4 h-full gap-3">
-                    <div className="flex items-center justify-center flex-1 w-full drop-shadow-md">
+            <div className="relative flex w-full h-[calc(100vh-70px)] lg:px-8 lg:py-10 gap-10 bg-white lg:bg-transparent">
+                <div className={"flex-col items-center justify-center w-full h-full gap-3 lg:relative lg:w-1/4 lg:flex " + (!conversationOpened ? "flex" : "hidden")} >
+                    <div className="flex items-center justify-center flex-1 w-full lg:drop-shadow-md lg:flex">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -192,11 +197,11 @@ export default function Conversations(props) {
                         </svg>
                         <input
                             type="text"
-                            placeholder="Rechercher"
-                            className="w-full px-4 py-2 pl-10 text-gray-600 bg-white border-0 rounded-full outline-none focus:outline-none focus:shadow-outline"
+                            placeholder="Rechercher une conversation"
+                            className="w-full px-4 py-4 pl-10 text-gray-600 border-0 outline-none lg:py-2 bg-gray-50 lg:rounded-full lg:bg-white focus:outline-none lg:focus:shadow-outline"
                         />
                     </div>
-                    <div className="flex flex-col w-full h-full gap-1 bg-white rounded-3xl drop-shadow-md">
+                    <div className="flex flex-col w-full h-full gap-1 bg-white lg:rounded-3xl lg:drop-shadow-md">
                         <h3 className="px-4 pt-4 font-bold">
                             Liste des messages
                         </h3>
@@ -206,9 +211,10 @@ export default function Conversations(props) {
                                     key={conv.id}
                                     className="flex items-center justify-between w-full px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-100"
                                     onClick={() => {
+                                        setConversationOpened(true);
                                         router.get(route("conversations"), {
                                             withUser_id: conv.user.id,
-                                        });
+                                        }, { preserveState: true });
                                     }}
                                 >
                                     <div className="flex items-center justify-between w-full">
@@ -246,12 +252,23 @@ export default function Conversations(props) {
                         })}
                     </div>
                 </div>
-                <div className="flex flex-col w-3/4 h-full">
-                    <div className="flex flex-col w-full h-full gap-4 bg-white rounded-3xl drop-shadow-md">
+                <div className={"flex-col h-full w-full lg:relative lg:w-3/4 lg:flex " + (conversationOpened ? "flex" : "hidden")}>
+                    <div className="flex flex-col w-full h-full gap-4 bg-white rounded-3xl lg:drop-shadow-md">
                         { conversation && (
                             <>
-                        <div className="flex justify-between px-4 pt-4">
+                            <hr className="lg:hidden" />
+                        <div className="flex justify-between px-4 lg:pt-4">
                             <div className="flex items-center gap-2">
+                                <button
+                                    className="flex items-center justify-center w-10 h-10 -mr-1.5 -ml-3 rounded-full hover:bg-gray-100"
+                                    onClick={() => {
+                                        setConversationOpened(false);
+                                    }}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                                    </svg>
+                                </button>
                                 <Avatar src={'https://picsum.photos/200'} />
                                 <p className="font-bold">
                                     {conversation.user.name}

@@ -35,7 +35,7 @@ export default function Dashboard(props) {
 
             <div className="flex items-center justify-between w-full min-h-[calc(100vh-70px)] bg-gray-100">
                 <div className="flex flex-col items-center justify-center w-full h-full gap-4">
-                    <div className="relative w-full h-2/3">
+                    <div className="relative w-full h-4/5 lg:h-2/3">
                         <div className="absolute aspect-video h-32 border-[3px] border-white rounded-xl -top-12 right-2">
                             <video id="cam-you" className="object-cover w-full h-full bg-purple-400 rounded-xl" autoPlay muted></video>
                         </div>
@@ -95,7 +95,7 @@ export default function Dashboard(props) {
                         </button>
                     </div>
                 </div>
-                <div className="flex flex-col items-center justify-center w-1/3 h-full bg-gray-200 rounded-tl-2xl"></div>
+                <div className="flex-col items-center justify-center hidden w-1/3 h-full bg-gray-200 lg:flex rounded-tl-2xl"></div>
             </div>
         </AuthenticatedLayout>
     );
