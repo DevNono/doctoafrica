@@ -1,7 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import React from 'react';
-import { router } from "@inertiajs/react";
 
 export default function Dashboard(props) {
 
