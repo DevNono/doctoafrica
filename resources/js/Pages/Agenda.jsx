@@ -16,7 +16,7 @@ export default function Dashboard(props) {
             header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Agenda</h2>}
         >
             <Head title="Agenda" />
-            <Agenda start={0} end={24} interval={0.5} startWeek={props.startWeek} events={[{ start: 12, end: 14.5, day: 4, title: "event 1" }, { start: 8, end: 12, day: 1, title: "event 2" }, { start: 15, end: 17, day: 6, title: "event3" }]} />
+            <Agenda start={480} end={1200} interval={20} startWeek={props.startWeek} now={props.now} events={[]} />
 
         </AuthenticatedLayout>
     );
