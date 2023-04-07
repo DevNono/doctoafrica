@@ -39,11 +39,14 @@ export default function Login({ status, canResetPassword }) {
             {status && <div className="mb-4 text-sm font-medium text-green-600">{status}</div>}
 
             <div className="flex items-center w-full h-full">
-                <div className="flex justify-center w-1/3 h-screen bg-cyan-400">
+                <div className="justify-center hidden w-1/3 h-screen lg:flex bg-cyan-400">
                     <ApplicationLogo />
                 </div>
-                <div className="flex justify-center w-full">
+                <div className="flex justify-center w-full px-8 lg:px-0">
                     <form onSubmit={submit} className='w-96'>
+                        <div className="lg:hidden">
+                            <ApplicationLogo />
+                        </div>
                         <div>
                             <InputLabel forInput="email" value="Email" />
 
