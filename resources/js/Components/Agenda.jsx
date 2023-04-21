@@ -1,4 +1,5 @@
 import { getDate, addDays, getHours, getDay, getMinutes } from 'date-fns'
+import { utcToZonedTime } from 'date-fns-tz'
 import { router } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
 
@@ -29,7 +30,7 @@ export default function Agenda({ start, end, interval, events, startWeek, now })
                 }
                 setdisplay(newdisplay);
             } else {
-                //TO DO : when user on monday and goes to previous day, it goes to monday instead of sunday
+                //TODO : when user on monday and goes to previous day, it goes to monday instead of sunday
                 router.get(route('agenda'), { startWeek: addDays(new Date(startWeek), currentDay == -1 ? -7 : 7) })
             }
 
@@ -41,14 +42,12 @@ export default function Agenda({ start, end, interval, events, startWeek, now })
     }
 
     function displayEvent(event, index) {
-        // TO DO : check if event is in the week
-        // TO DO : check timezone
-        // TO DO : event text of hidden event still visible
-        let date = new Date(event.date);
+        let date = utcToZonedTime(new Date(event.date), 'Europe/Paris');
         let startEvent = dateToMinutes(date);
         let rowStart = Math.floor((startEvent - start) / interval) + 1;
         let rowEnd = Math.floor((startEvent + event.duration - start) / interval) + 1;
-        return <div key={`event-${index}`} className="bg-slate-500" style={{ gridRowStart: `${rowStart}`, gridRowEnd: `${rowEnd}`, gridColumnStart: ((getDay(date) + 6) % 7) + 2, gridColumnEnd: ((getDay(date) + 6) % 7) + 3 }}>{event.title}</div>
+        let isDisplayed = currentDay == null || currentDay == ((getDay(date) + 6) % 7) ? 'block' : 'none';
+        return <div key={`event-${index}`} className="bg-slate-500" style={{ gridRowStart: `${rowStart}`, gridRowEnd: `${rowEnd}`, gridColumnStart: ((getDay(date) + 6) % 7) + 2, gridColumnEnd: ((getDay(date) + 6) % 7) + 3, display : isDisplayed }}>{event.title}</div>
     }
 
     function blocks() {
@@ -90,7 +89,7 @@ export default function Agenda({ start, end, interval, events, startWeek, now })
     }
 
     function displayNow() {
-        let date = new Date(now);
+        let date = utcToZonedTime(new Date(now), 'Europe/Paris');
         if (date < new Date(startWeek) || date > addDays(new Date(startWeek), 7)) {
             return;
         }
