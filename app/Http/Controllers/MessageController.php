@@ -68,7 +68,6 @@ class MessageController extends Controller
             'conversation' => $request->withUser_id ? new ConversationResource($conversation) : null,
             'withUser_id' => $request->withUser_id ? $request->withUser_id : null,
             'conversations' => $conversations,
-            'users' => new UserCollection($users),
         ]);
     }
 }
