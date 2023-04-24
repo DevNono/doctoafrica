@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import MainSearchBar from '@/Components/NavBar/MainSearchBar';
 import NotificationBell from '@/Components/NavBar/NotificationBell';
 import LeftNavButton from '@/Components/NavBar/LeftNavButton';
 import Avatar from '@/Components/Avatar';
 import { Link, usePage } from '@inertiajs/react';
+import UserProfilPopup from '@/Components/UserProfilPopup';
 
 export default function Authenticated({ auth, children }) {
     const { url } = usePage();
+
+    const [selectedUser, setSelectedUser] = useState(null);
+
+    const handleUserSelect = (user) => {
+        setSelectedUser(user);
+    };
 
     return (
         <div className="w-full min-h-screen bg-gray-50">
@@ -15,7 +22,7 @@ export default function Authenticated({ auth, children }) {
                 <Link href="/" className="flex items-center lg:mr-auto lg:flex-1">
                     <ApplicationLogo className="block w-auto h-9" />
                 </Link>
-                <MainSearchBar />
+                <MainSearchBar onSelect={handleUserSelect} />
                 <div className="flex items-center gap-8 lg:ml-auto lg:justify-end lg:flex-1">
                     <a className="flex items-center cursor-pointer lg:hidden">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -124,6 +131,11 @@ export default function Authenticated({ auth, children }) {
                     </LeftNavButton>
                 </nav>
                 {children}
+                {selectedUser &&
+                    <UserProfilPopup
+                        user={selectedUser}
+                        onClose={() => setSelectedUser(null)} />
+                }
             </main>
         </div>
     );
