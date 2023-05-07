@@ -1,7 +1,10 @@
+import { unsetUser } from '@/Store/redux';
 import React, { useState, useEffect } from 'react';
-import { router } from "@inertiajs/react";
+import { useDispatch } from 'react-redux';
 
 export default function UserProfilPopup({ user, onClose }) {
+
+    const dispatch = useDispatch();
 
     return (
         <div className="fixed w-full h-full bg-gray-500 bg-opacity-50 flex items-center justify-center">
@@ -45,7 +48,7 @@ export default function UserProfilPopup({ user, onClose }) {
                 </div>
 
                 <div className="absolute top-0 right-0 h-12 w-18 p-4">
-                    <button onClick={onClose}>X</button>
+                    <button onClick={() => dispatch(unsetUser())}>X</button>
                 </div>
 
             </div>
