@@ -1,4 +1,5 @@
 {
+    "name": "DoctoAfrica",
     "private": true,
     "scripts": {
         "dev": "vite",
