@@ -413,10 +413,10 @@ export default function Conversations(props) {
                         )}
                     </div>
                 </div>
-                {showUserList && (
+            </div>
+            {showUserList && (
                     <UserListPopup onClose={handleUserListClose} />
                 )}
-            </div>
         </AuthenticatedLayout>
     );
 }

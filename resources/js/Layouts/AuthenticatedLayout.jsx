@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import MainSearchBar from '@/Components/NavBar/MainSearchBar';
 import NotificationBell from '@/Components/NavBar/NotificationBell';
 import LeftNavButton from '@/Components/NavBar/LeftNavButton';
 import Avatar from '@/Components/Avatar';
 import { Link, usePage } from '@inertiajs/react';
+import UserProfilPopup from '@/Components/UserProfilPopup';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser } from '@/Store/redux';
 
 export default function Authenticated({ auth, children }) {
     const { url } = usePage();
+
+    const user = useSelector(state => state.user);
+    const dispatch = useDispatch();
 
     return (
         <div className="w-full min-h-screen bg-gray-50">
@@ -23,7 +29,7 @@ export default function Authenticated({ auth, children }) {
                         </svg>
                     </a>
                     <NotificationBell notification={true} />
-                    <div className="hidden gap-2 lg:flex">
+                    <div onClick={() => {dispatch(setUser(auth.user))}} className="hidden gap-2 lg:flex">
                         <Avatar src={'https://picsum.photos/200'} />
                         <div className="flex flex-col justify-around">
                             <p className="-mb-2 font-bold">{auth.user.name}</p>
@@ -124,6 +130,10 @@ export default function Authenticated({ auth, children }) {
                     </LeftNavButton>
                 </nav>
                 {children}
+                {user &&
+                    <UserProfilPopup
+                        user={user} />
+                }
             </main>
         </div>
     );
